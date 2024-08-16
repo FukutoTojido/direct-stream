@@ -13,7 +13,7 @@ export default function Chat({ data }: { data: UserState }) {
         containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
     }, [messages.length]);
 
-    const { sendJsonMessage } = useWebSocket("ws://live.tryz.id.vn/ws", {
+    const { sendJsonMessage } = useWebSocket("wss://live.tryz.id.vn/ws", {
         onOpen: () => {
             console.log("WebSocket connected!");
         },
