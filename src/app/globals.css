@@ -3,31 +3,93 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+    :root {
+        --foreground-rgb: 255, 255, 255;
+        --background-start-rgb: 0, 0, 0;
+        --background-end-rgb: 0, 0, 0;
+    }
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+    color: rgb(var(--foreground-rgb));
+    background: #25263a;
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+    .text-balance {
+        text-wrap: balance;
+    }
+}
+
+@keyframes osuSpinnerKurwa {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        stroke-dashoffset: 200;
+        transform: scale(1, 1);
+    }
+    50% {
+        stroke-dashoffset: 0;
+        transform: scale(1, 1);
+    }
+    50.0001% {
+        transform: scale(1, -1) translateY(-90px);
+    }
+    99.9999% {
+        stroke-dashoffset: 200;
+        transform: scale(1, -1) translateY(-90px);
+    }
+    100% {
+        transform: scale(1, 1);
+    }
+}
+
+.loading svg {
+    display: block;
+    animation: linear osuSpinnerKurwa 2s infinite;
+}
+
+.loading circle {
+    fill: none;
+    stroke: white;
+    stroke-width: 10px;
+    stroke-dasharray: 200;
+    stroke-dashoffset: 150;
+    stroke-linecap: round;
+
+    animation: spin 2s infinite;
+}
+
+.chatInput:empty::before {
+    content: "NANDE HARUHIKAGE YATTA NO?";
+    opacity: 30%;
+    cursor: text;
+}
+
+/*Scrollbar*/
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Handle */
+
+::-webkit-scrollbar-thumb {
+    background: grey;
+    border-radius: 10px;
+ 
+    box-sizing: border-box;
 }

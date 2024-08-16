@@ -1,113 +1,163 @@
+"use client";
+
+import useAuth from "@/hooks/useAuth";
+import { useRef, useState, useEffect } from "react";
+import { SrsRtcWhipWhepAsync } from "@/lib/SRS";
 import Image from "next/image";
+import Link from "next/link";
+import { LogOut } from "lucide-react";
+import Chat from "./components/Chat";
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+export default function App() {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [sdk, setSdk] = useState<any>();
+    const userData = useAuth();
+
+    useEffect(() => {
+        sdk?.close();
+
+        if (!videoRef.current || !userData) return;
+
+        const videoUrl = "https://live.tryz.id.vn:8443/rtc/v1/whep/?app=live&stream=livestream";
+
+        const initPlayer = async () => {
+            const player = SrsRtcWhipWhepAsync();
+            videoRef.current!.srcObject = player.stream;
+
+            setSdk(player);
+
+            try {
+                await player.play(videoUrl);
+            } catch (e) {
+                player?.close();
+                console.error(e);
+            }
+        };
+
+        initPlayer();
+
+        return () => {
+            sdk?.close();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userData]);
+
+    if (userData === undefined) {
+        return (
+            <div className="w-screen h-screen flex flex-col p-5 gap-5 items-center justify-center loading">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="90px" height="90px">
+                    <circle cx="45" cy="45" r="30" strokeLinecap="round" />
+                </svg>
+                Please wait...
+            </div>
+        );
+    }
+
+    if (userData === null) {
+        return (
+            <div className="w-screen h-screen flex p-5 gap-5 items-center justify-center">
+                <div className="w-[800px] flex p-10 gap-8 bg-[#363753] rounded-xl items-center">
+                    <Image src="/RI.png" alt="" width={200} height={200} className="rounded-full" />
+                    <div className="flex flex-col gap-5 flex-1">
+                        <div className="flex flex-col">
+                            <div className="text-3xl font-bold">rinimi.dev</div>
+                            <div className="text-lg font-light italic">Bông Rinami là số một</div>
+                        </div>
+                        <Link
+                            href="/api/auth"
+                            className=" p-5 w-full rounded-xl bg-[#2B2C43] flex gap-5 items-center hover:bg-[#75779F] transition-all"
+                        >
+                            <Image src="/discord-mark-white.svg" alt="" width={40} height={40} />
+                            <div className="font-bold">Đăng nhập</div>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!userData.isJoinedServer) {
+        return (
+            <div className="w-screen h-screen flex p-5 gap-5 items-center justify-center">
+                <div className="w-[800px] flex p-10 gap-8 bg-[#363753] rounded-xl items-center">
+                    <Image src="/RI.png" alt="" width={200} height={200} className="rounded-full" />
+                    <div className="flex flex-col gap-5">
+                        <div className="flex flex-col">
+                            <div className="text-3xl font-bold">Alert!</div>
+                            <div className="text-lg font-light italic">Bạn cần phải ở trong server THE iDOLM@STER Vietnam để được xem</div>
+                        </div>
+                        <button
+                            className="p-5 w-full rounded-xl bg-[#D25A5A] flex gap-5 items-center hover:bg-[#F03636] transition-all"
+                            onClick={async () => {
+                                try {
+                                    const res = await fetch("/api/logout", {
+                                        method: "POST",
+                                    });
+
+                                    if (!res.ok) {
+                                        const reason = await res.text();
+                                        throw new Error(reason);
+                                    }
+
+                                    window.location.reload();
+                                } catch (error) {
+                                    console.error(error);
+                                }
+                            }}
+                        >
+                            <LogOut size={40} />
+                            <div className="font-bold">Đăng xuất</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="w-screen h-screen flex p-5 gap-5">
+            <video controls autoPlay muted ref={videoRef} className="flex-1 bg-[#363753] rounded-xl w-0"></video>
+            <div className="h-full w-[400px] flex flex-col gap-5">
+                <Chat data={userData} />
+                <div className="bg-[#363753] rounded-xl p-5 flex gap-5 items-center">
+                    {userData.avatar === "" ? (
+                        <div className="bg-black/50 rounded-full"></div>
+                    ) : (
+                        <Image
+                            src={`https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`}
+                            alt=""
+                            width={40}
+                            height={40}
+                            className="rounded-full"
+                        />
+                    )}
+                    <div className="truncate flex-1 flex flex-col">
+                        <div className="text-lg font-bold">{userData.global_name}</div>
+                        <div className="text-sm font-light ">{userData.username}</div>
+                    </div>
+                    <button
+                        className="rounded-xl text-white hover:text-[#D25A5A] transition-all"
+                        onClick={async () => {
+                            try {
+                                const res = await fetch("/api/logout", {
+                                    method: "POST",
+                                });
+
+                                if (!res.ok) {
+                                    const reason = await res.text();
+                                    throw new Error(reason);
+                                }
+
+                                window.location.reload();
+                            } catch (error) {
+                                console.error(error);
+                            }
+                        }}
+                    >
+                        <LogOut size={30} />
+                    </button>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+    );
 }
