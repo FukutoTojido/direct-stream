@@ -14,23 +14,27 @@ export default function useAuth() {
                 return;
             }
 
-            const oauth = new DiscordOauth2();
-        
-            const { username, avatar, id, global_name } = await oauth.getUser(accessToken);
-            const userGuilds = await oauth.getUserGuilds(accessToken);
-            const isJoinedServer = userGuilds.some((server) => server.id === "228205151981273088");
+            try {
+                const oauth = new DiscordOauth2();
 
-            setState({
-                username,
-                global_name: global_name ?? username,
-                avatar: avatar ?? "",
-                id,
-                isJoinedServer
-            })
-        }
+                const { username, avatar, id, global_name } = await oauth.getUser(accessToken);
+                const userGuilds = await oauth.getUserGuilds(accessToken);
+                const isJoinedServer = userGuilds.some((server) => server.id === "228205151981273088");
+
+                setState({
+                    username,
+                    global_name: global_name ?? username,
+                    avatar: avatar ?? "",
+                    id,
+                    isJoinedServer,
+                });
+            } catch (error) {
+                setState(null);
+            }
+        };
 
         getData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return state;

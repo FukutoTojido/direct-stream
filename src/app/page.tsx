@@ -55,11 +55,11 @@ export default function App() {
 
     if (userData === null) {
         return (
-            <div className="w-screen h-screen flex p-5 gap-5 items-center justify-center">
-                <div className="w-[800px] flex p-10 gap-8 bg-[#363753] rounded-xl items-center">
+            <div className="w-screen h-dvh flex p-5 gap-5 items-center justify-center">
+                <div className="w-[800px] flex p-10 gap-8 bg-[#363753] rounded-xl items-center lg:flex-row flex-col">
                     <Image src="/RI.png" alt="" width={200} height={200} className="rounded-full" />
                     <div className="flex flex-col gap-5 flex-1">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col lg:text-left text-center">
                             <div className="text-3xl font-bold">rinimi.dev</div>
                             <div className="text-lg font-light italic">Bông Rinami là số một</div>
                         </div>
@@ -79,7 +79,7 @@ export default function App() {
     if (!userData.isJoinedServer) {
         return (
             <div className="w-screen h-screen flex p-5 gap-5 items-center justify-center">
-                <div className="w-[800px] flex p-10 gap-8 bg-[#363753] rounded-xl items-center">
+                <div className="w-[800px] flex p-10 gap-8 bg-[#363753] rounded-xl items-center lg:flex-row flex-col">
                     <Image src="/RI.png" alt="" width={200} height={200} className="rounded-full" />
                     <div className="flex flex-col gap-5">
                         <div className="flex flex-col">
