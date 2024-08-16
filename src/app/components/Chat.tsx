@@ -65,24 +65,28 @@ export default function Chat({ data }: { data: UserState }) {
             <div className="flex-1 w-full p-5 bg-[#2B2C43] flex flex-col gap-5 overflow-y-auto" ref={containerRef}>
                 {messages.map((message, idx) => {
                     return (
-                        <div key={idx} className="flex gap-2.5 items-center">
+                        <div key={idx} className="flex gap-2.5 items-start">
                             <Image
-                                src={`https://cdn.discordapp.com/avatars/${data?.id}/${data?.avatar}.png`}
+                                src={`https://cdn.discordapp.com/avatars/${message?.id}/${message?.avatar}.png`}
                                 alt=""
                                 width={30}
                                 height={30}
                                 className="rounded-full"
                             />
-                            <div className="font-bold">{message.global_name}</div>
-                            <div>{message.content}</div>
+                            <div className="break-all">
+                                <span className="font-bold pr-2.5">{message.global_name}</span>
+                                <span>{message.content}</span>
+                            </div>
                         </div>
                     );
                 })}
             </div>
             <div className="flex w-full gap-5 items-center p-5">
-                <div className="flex-1 text-base focus:outline-none chatInput" contentEditable ref={chatRef}></div>
+                <div className="flex-1 text-base focus:outline-none chatInput break-all" contentEditable ref={chatRef}></div>
                 <div className="h-full border-r-2 border-[#75779F]"></div>
-                <SendHorizontal />
+                <button onClick={() => sendMessage()}>
+                    <SendHorizontal />
+                </button>
             </div>
         </div>
     );
