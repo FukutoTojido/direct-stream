@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         cookies().delete("access_token");
         cookies().delete("refresh_token");
 
-        return new Response(error.response ?? error, {
+        return new Response(JSON.stringify(error.response) ?? error, {
             status: 500,
         });
     }
