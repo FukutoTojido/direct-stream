@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
             secure: true,
         });
 
-        return NextResponse.redirect(`${request.nextUrl.origin}/`, { status: 302 });
+        return NextResponse.redirect(`https://live.tryz.id.vn/`, { status: 302 });
     } catch (error: any) {
         cookies().delete("access_token");
         cookies().delete("refresh_token");
