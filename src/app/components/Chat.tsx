@@ -61,7 +61,7 @@ export default function Chat({ data }: { data: UserState }) {
     }, []);
 
     return (
-        <div className="bg-[#363753] rounded-xl flex-1 flex flex-col overflow-hidden">
+        <div className="bg-[#363753] lg:rounded-xl flex-1 flex flex-col overflow-hidden">
             <div className="flex-1 w-full p-5 bg-[#2B2C43] flex flex-col gap-5 overflow-y-auto" ref={containerRef}>
                 {messages.map((message, idx) => {
                     return (

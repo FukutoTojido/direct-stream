@@ -115,11 +115,11 @@ export default function App() {
     }
 
     return (
-        <div className="w-screen h-screen flex p-5 gap-5">
-            <video controls autoPlay muted ref={videoRef} className="flex-1 bg-[#363753] rounded-xl w-0"></video>
-            <div className="h-full w-[400px] flex flex-col gap-5">
+        <div className="w-screen h-screen flex lg:p-5 lg:gap-5 flex-col lg:flex-row">
+            <video controls autoPlay muted ref={videoRef} className="lg:flex-1 bg-[#363753] lg:rounded-xl lg:w-0 w-full"></video>
+            <div className="lg:h-full lg:w-[400px] flex lg:flex-col flex-col-reverse lg:gap-5 flex-1 lg:flex-none overflow-hidden">
                 <Chat data={userData} />
-                <div className="bg-[#363753] rounded-xl p-5 flex gap-5 items-center">
+                <div className="bg-[#363753] lg:rounded-xl p-5 flex gap-5 items-center">
                     {userData.avatar === "" ? (
                         <div className="bg-black/50 rounded-full"></div>
                     ) : (
