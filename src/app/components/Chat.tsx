@@ -94,7 +94,7 @@ export default function Chat({ data }: { data: UserState }) {
                 })}
             </div>
             <div className="flex w-full gap-5 items-center p-5">
-                <div className="flex-1 text-base focus:outline-none chatInput break-all" contentEditable ref={chatRef}></div>
+                <div className="flex-1 text-base focus:outline-none chatInput break-words overflow-hidden" contentEditable ref={chatRef}></div>
                 <div className="h-full border-r-2 border-[#75779F]"></div>
                 <button onClick={() => sendMessage()}>
                     <SendHorizontal />
