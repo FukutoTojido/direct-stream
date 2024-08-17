@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import DiscordOauth2 from "discord-oauth2";
+import DiscordOauth2 from "@/lib/discord-oauth2";
 import { redirect } from "next/navigation";
 
 export async function GET(request: NextRequest) {

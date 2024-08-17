@@ -22,6 +22,7 @@ declare namespace OAuth {
 	export interface Member {
 		user?: User;
 		nick: string | null | undefined;
+		avatar?: string | null | undefined;
 		roles: string[];
 		joined_at: number;
 		premium_since?: number | null | undefined;
