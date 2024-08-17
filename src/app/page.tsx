@@ -7,9 +7,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { LogOut } from "lucide-react";
 import Chat from "./components/Chat";
+import { deleteCookie } from "cookies-next";
 
-function ErrorContainer({ error }: { error?: string }) {
-    return !error || error === "" || error === "{}" ? (
+function ErrorContainer({ error }: { error: string }) {
+    return error === "" || error === "{}" ? (
         ""
     ) : (
         <div className="absolute bottom-10 p-5 rounded-xl left-0 right-0 mx-auto bg-red-500 text-white font-bold w-full break-words overflow-hidden">
@@ -20,7 +21,7 @@ function ErrorContainer({ error }: { error?: string }) {
 
 export default function App() {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [error, setError] = useState<string>();
+    const [error, setError] = useState<string>("");
     const [sdk, setSdk] = useState<any>();
     const userData = useAuth({ setError });
 
@@ -161,6 +162,9 @@ export default function App() {
                                     const reason = await res.text();
                                     throw new Error(reason);
                                 }
+
+                                deleteCookie("access_token");
+                                deleteCookie("refresh_token");
 
                                 window.location.reload();
                             } catch (error) {

@@ -3,13 +3,14 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import DiscordOauth2 from "discord-oauth2";
 import { getCookie } from "cookies-next";
 
-export default function useAuth({ setError }: { setError: Dispatch<SetStateAction<string | undefined>> }) {
+export default function useAuth({ setError }: { setError: Dispatch<SetStateAction<string>> }) {
     const [state, setState] = useState<UserState>();
     const [accessToken] = [getCookie("access_token")];
 
     useEffect(() => {
         const getData = async () => {
             if (!accessToken) {
+                setError("No access token found?");
                 setState(null);
                 return;
             }
