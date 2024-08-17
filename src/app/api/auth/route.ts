@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import DiscordOauth2 from "discord-oauth2";
 import { redirect } from "next/navigation";
-import { request as req } from "undici";
 
 export async function GET(request: NextRequest) {
     const code = request.nextUrl.searchParams.get("code") ?? undefined;
@@ -14,49 +14,32 @@ export async function GET(request: NextRequest) {
                 : "https://discord.com/oauth2/authorize?client_id=1115953141146464276&response_type=code&redirect_uri=https%3A%2F%2Flive.tryz.id.vn%2Fapi%2Fauth&scope=identify+guilds+guilds.members.read"
         );
 
+    const oauth = new DiscordOauth2();
+
     try {
-        const authSector: Record<string, string> = {
-            client_id: process.env.CLIENT_ID ?? "",
-            client_secret: process.env.CLIENT_SECRET ?? "",
-            redirect_uri: process.env.NODE_ENV === "development" ? "http://localhost:3000/api/auth" : "https://live.tryz.id.vn/api/auth",
-            scope: "identify guilds guilds.members.read",
-        };
+        const oauthResponse = refreshToken
+            ? await oauth.tokenRequest({
+                  clientId: process.env.CLIENT_ID,
+                  clientSecret: process.env.CLIENT_SECRET,
+                  redirectUri: process.env.NODE_ENV === "development" ? "http://localhost:3000/api/auth" : "https://live.tryz.id.vn/api/auth",
+                  refreshToken,
+                  grantType: "refresh_token",
+                  scope: "identify guilds guilds.members.read",
+              })
+            : await oauth.tokenRequest({
+                  clientId: process.env.CLIENT_ID,
+                  clientSecret: process.env.CLIENT_SECRET,
+                  redirectUri: process.env.NODE_ENV === "development" ? "http://localhost:3000/api/auth" : "https://live.tryz.id.vn/api/auth",
+                  code,
+                  scope: "identify guilds guilds.members.read",
+                  grantType: "authorization_code",
+              });
 
-        const funcSector: Record<string, string> = refreshToken
-            ? {
-                  refresh_token: refreshToken,
-                  grant_type: "refresh_token",
-              }
-            : {
-                  code: code ?? "",
-                  grant_type: "authorization_code",
-              };
-
-        const body = {
-            ...authSector,
-            ...funcSector,
-        };
-
-        const res = await req("https://discord.com/api/oauth2/token", {
-            method: "POST",
-            body: new URLSearchParams(body).toString(),
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-        });
-
-        const oauthResponse = (await res.body.json()) as {
-            access_token: string;
-            refresh_token: string;
-            token_type: string;
-            expires_in: number;
-        };
-
-        cookies().set("access_token", oauthResponse?.access_token, {
+        cookies().set("access_token", oauthResponse.access_token, {
             sameSite: "strict",
             secure: true,
         });
-        cookies().set("refresh_token", oauthResponse?.refresh_token, {
+        cookies().set("refresh_token", oauthResponse.refresh_token, {
             sameSite: "strict",
             secure: true,
         });

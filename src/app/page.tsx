@@ -9,21 +9,20 @@ import { LogOut } from "lucide-react";
 import Chat from "./components/Chat";
 import { deleteCookie } from "cookies-next";
 
-function ErrorContainer({ error }: { error: string }) {
-    return error === "" || error === "{}" ? (
-        ""
-    ) : (
-        <div className="absolute bottom-10 p-5 rounded-xl left-0 right-0 mx-auto bg-red-500 text-white font-bold w-full break-words overflow-hidden">
-            {error}
-        </div>
-    );
-}
+// function ErrorContainer({ error }: { error: string }) {
+//     return error === "" || error === "{}" ? (
+//         ""
+//     ) : (
+//         <div className="absolute bottom-10 p-5 rounded-xl left-0 right-0 mx-auto bg-red-500 text-white font-bold w-full break-words overflow-hidden">
+//             {error}
+//         </div>
+//     );
+// }
 
 export default function App() {
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [error, setError] = useState<string>("");
     const [sdk, setSdk] = useState<any>();
-    const userData = useAuth({ setError });
+    const userData = useAuth();
 
     useEffect(() => {
         sdk?.close();
@@ -57,7 +56,6 @@ export default function App() {
     if (userData === undefined) {
         return (
             <div className="w-screen h-dvh flex flex-col p-5 gap-5 items-center justify-center loading relative">
-                <ErrorContainer error={error} />
                 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="90px" height="90px">
                     <circle cx="45" cy="45" r="30" strokeLinecap="round" />
                 </svg>
@@ -69,7 +67,6 @@ export default function App() {
     if (userData === null) {
         return (
             <div className="w-screen h-dvh flex p-5 gap-5 items-center justify-center relative">
-                <ErrorContainer error={error} />
                 <div className="relative w-[800px] flex p-10 gap-8 bg-[#363753] rounded-xl items-center lg:flex-row flex-col">
                     <Image src="/RI.png" alt="" width={200} height={200} className="rounded-full" />
                     <div className="flex flex-col gap-5 flex-1">
@@ -93,7 +90,6 @@ export default function App() {
     if (!userData.isJoinedServer) {
         return (
             <div className="w-screen h-dvh flex p-5 gap-5 items-center justify-center relative">
-                <ErrorContainer error={error} />
                 <div className="relative w-[800px] flex p-10 gap-8 bg-[#363753] rounded-xl items-center lg:flex-row flex-col">
                     <Image src="/RI.png" alt="" width={200} height={200} className="rounded-full" />
                     <div className="flex flex-col gap-5">

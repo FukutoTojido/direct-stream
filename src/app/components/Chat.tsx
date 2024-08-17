@@ -68,6 +68,7 @@ export default function Chat({ data }: { data: UserState }) {
         chatElement?.addEventListener("keydown", handleInput);
 
         return () => chatElement?.removeEventListener("keydown", handleInput);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

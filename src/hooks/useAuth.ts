@@ -1,23 +1,22 @@
 import { UserState } from "@/types/types";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import DiscordOauth2 from "discord-oauth2";
+import { useEffect, useState } from "react";
+import DiscordOauth2 from "@/lib/discord-oauth2";
 import { getCookie } from "cookies-next";
 
-export default function useAuth({ setError }: { setError: Dispatch<SetStateAction<string>> }) {
+export default function useAuth() {
     const [state, setState] = useState<UserState>();
     const [accessToken] = [getCookie("access_token")];
 
     useEffect(() => {
         const getData = async () => {
             if (!accessToken) {
-                setError("No access token found?");
                 setState(null);
                 return;
             }
 
             try {
                 const oauth = new DiscordOauth2();
-
+                
                 const { username, avatar, id, global_name } = await oauth.getUser(accessToken);
                 const userGuilds = await oauth.getUserGuilds(accessToken);
                 const isJoinedServer = userGuilds.some((server) => server.id === "228205151981273088");
@@ -30,7 +29,7 @@ export default function useAuth({ setError }: { setError: Dispatch<SetStateActio
                     isJoinedServer,
                 });
             } catch (error) {
-                setError(JSON.stringify(error));
+                console.log(error);
                 setState(null);
             }
         };
