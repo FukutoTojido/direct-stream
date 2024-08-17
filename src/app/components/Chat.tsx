@@ -48,6 +48,8 @@ export default function Chat({ data }: { data: UserState }) {
                 content: chatContent,
             },
         });
+
+        chatRef.current!.innerHTML = "";
     };
 
     useEffect(() => {
