@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import DiscordOauth2 from "discord-oauth2";
 import { redirect } from "next/navigation";
+import { request as req } from "undici";
 
 export async function GET(request: NextRequest) {
     const code = request.nextUrl.searchParams.get("code") ?? undefined;
@@ -17,29 +18,46 @@ export async function GET(request: NextRequest) {
     const oauth = new DiscordOauth2();
 
     try {
-        const oauthResponse = refreshToken
-            ? await oauth.tokenRequest({
-                  clientId: process.env.CLIENT_ID,
-                  clientSecret: process.env.CLIENT_SECRET,
-                  redirectUri: process.env.NODE_ENV === "development" ? "http://localhost:3000/api/auth" : "https://live.tryz.id.vn/api/auth",
+        const authSector: Record<string, string> = {
+            clientId: process.env.CLIENT_ID ?? "",
+            clientSecret: process.env.CLIENT_SECRET ?? "",
+            redirectUri: process.env.NODE_ENV === "development" ? "http://localhost:3000/api/auth" : "https://live.tryz.id.vn/api/auth",
+            scope: "identify guilds guilds.members.read",
+        };
+
+        const funcSector: Record<string, string> = refreshToken
+            ? {
                   refreshToken,
                   grantType: "refresh_token",
-                  scope: "identify guilds guilds.members.read",
-              })
-            : await oauth.tokenRequest({
-                  clientId: process.env.CLIENT_ID,
-                  clientSecret: process.env.CLIENT_SECRET,
-                  redirectUri: process.env.NODE_ENV === "development" ? "http://localhost:3000/api/auth" : "https://live.tryz.id.vn/api/auth",
-                  code,
-                  scope: "identify guilds guilds.members.read",
+              }
+            : {
+                  code: code ?? "",
                   grantType: "authorization_code",
-              });
+              };
 
-        cookies().set("access_token", oauthResponse.access_token, {
+        const res = await req("https://discord.com/api/oauth2/token", {
+            method: "POST",
+            body: new URLSearchParams({
+                ...authSector,
+                ...funcSector,
+            }).toString(),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        });
+
+        const oauthResponse = (await res.body.json()) as {
+            access_token: string,
+            refresh_token: string,
+            token_type: string,
+            expires_in: number
+        } ;
+
+        cookies().set("access_token", oauthResponse?.access_token, {
             sameSite: "strict",
             secure: true,
         });
-        cookies().set("refresh_token", oauthResponse.refresh_token, {
+        cookies().set("refresh_token", oauthResponse?.refresh_token, {
             sameSite: "strict",
             secure: true,
         });
