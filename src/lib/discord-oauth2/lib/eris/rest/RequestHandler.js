@@ -38,7 +38,7 @@ class RequestHandler extends EventEmitter {
 
 		this.options = options = Object.assign({
 			agent: null,
-			baseURL: "/api/v9",
+			baseURL: "/api",
 			domain: "discord.com",
 			disableLatencyCompensation: false,
 			latencyThreshold: 30000,

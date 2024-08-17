@@ -1,11 +1,11 @@
-import { UserState, Message, SOCKET_ENUM } from "@/types/types";
+import { UserState, Message, SOCKET_ENUM, JoinLeaveMessage } from "@/types/types";
 import { SendHorizontal, Users } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import useWebSocket from "react-use-websocket";
 
 export default function Chat({ data }: { data: UserState }) {
-    const [messages, setMessages] = useState<Message[]>([]);
+    const [messages, setMessages] = useState<(Message | JoinLeaveMessage)[]>([]);
     const [userCount, setUserCount] = useState<number>(0);
     const chatRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -21,7 +21,7 @@ export default function Chat({ data }: { data: UserState }) {
         onMessage: (event) => {
             const { type, payload } = JSON.parse(event.data);
 
-            if (type === SOCKET_ENUM.NEW_MESSAGE) {
+            if (type === SOCKET_ENUM.USER_STATE || type === SOCKET_ENUM.NEW_MESSAGE) {
                 setMessages([...messages, payload]);
                 return;
             }
@@ -68,8 +68,17 @@ export default function Chat({ data }: { data: UserState }) {
         chatElement?.addEventListener("keydown", handleInput);
 
         return () => chatElement?.removeEventListener("keydown", handleInput);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (!data) return;
+
+        sendJsonMessage?.({
+            type: SOCKET_ENUM.NEW_USER,
+            payload: data,
+        });
+    }, [sendJsonMessage, data]);
 
     return (
         <div className="bg-[#363753] lg:rounded-xl flex-1 flex flex-col overflow-hidden">
@@ -79,21 +88,39 @@ export default function Chat({ data }: { data: UserState }) {
             </div>
             <div className="flex-1 w-full p-5 bg-[#2B2C43] flex flex-col gap-5 overflow-y-auto" ref={containerRef}>
                 {messages.map((message, idx) => {
-                    return (
-                        <div key={idx} className="flex gap-2.5 items-start">
-                            <Image
-                                src={`https://cdn.discordapp.com/avatars/${message?.id}/${message?.avatar}.png`}
-                                alt=""
-                                width={30}
-                                height={30}
-                                className="rounded-full"
-                            />
-                            <div className="break-words overflow-x-hidden">
-                                <span className="font-bold pr-2.5">{message.global_name}</span>
-                                <span className="">{message.content}</span>
+                    if ((message as Message).content) {
+                        const mes = message as Message;
+                        return (
+                            <div key={idx} className="flex gap-2.5 items-start">
+                                <Image
+                                    src={
+                                        data!.isGuildAvatar
+                                            ? `https://cdn.discordapp.com/guilds/228205151981273088/users/${mes.id}/avatars/${mes.avatar}.png`
+                                            : `https://cdn.discordapp.com/avatars/${mes.id}/${mes.avatar}.png`
+                                    }
+                                    alt=""
+                                    width={30}
+                                    height={30}
+                                    className="rounded-full"
+                                />
+                                <div className="break-words overflow-x-hidden">
+                                    <span className="font-bold pr-2.5">{mes.global_name}</span>
+                                    <span className="">{mes.content}</span>
+                                </div>
                             </div>
-                        </div>
-                    );
+                        );
+                    }
+
+                    if ((message as JoinLeaveMessage).state) {
+                        const mes = message as JoinLeaveMessage;
+                        return (
+                            <div key={idx} className="flex gap-2.5 items-start">
+                                <div className="break-words overflow-x-hidden text-sm text-gray-400">
+                                    {mes.username} has joined the chat.
+                                </div>
+                            </div>
+                        );
+                    }
                 })}
             </div>
             <div className="flex w-full gap-5 items-center p-5">

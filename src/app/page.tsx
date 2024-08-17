@@ -126,7 +126,7 @@ export default function App() {
     }
 
     return (
-        <div className="w-screen h-screen flex lg:p-5 lg:gap-5 flex-col lg:flex-row">
+        <div className="w-screen h-dvh flex lg:p-5 lg:gap-5 flex-col lg:flex-row">
             <video controls autoPlay muted ref={videoRef} className="lg:flex-1 bg-[#363753] lg:rounded-xl lg:w-0 w-full"></video>
             <div className="lg:h-full lg:w-[400px] flex lg:flex-col flex-col-reverse lg:gap-5 flex-1 lg:flex-none overflow-hidden">
                 <Chat data={userData} />
@@ -135,7 +135,11 @@ export default function App() {
                         <div className="bg-black/50 rounded-full"></div>
                     ) : (
                         <Image
-                            src={`https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`}
+                            src={
+                                userData.isGuildAvatar
+                                    ? `https://cdn.discordapp.com/guilds/228205151981273088/users/${userData.id}/avatars/${userData.avatar}.png`
+                                    : `https://cdn.discordapp.com/avatars/${userData.id}/${userData.avatar}.png`
+                            }
                             alt=""
                             width={40}
                             height={40}
