@@ -79,7 +79,7 @@ export default function Chat({ data }: { data: UserState }) {
             <div className="flex-1 w-full p-5 bg-[#2B2C43] flex flex-col gap-5 overflow-y-auto" ref={containerRef}>
                 {messages.map((message, idx) => {
                     return (
-                        <div key={idx} className="flex gap-2.5 items-start overflow-hidden">
+                        <div key={idx} className="flex gap-2.5 items-start overflow-x-hidden">
                             <Image
                                 src={`https://cdn.discordapp.com/avatars/${message?.id}/${message?.avatar}.png`}
                                 alt=""
@@ -87,9 +87,9 @@ export default function Chat({ data }: { data: UserState }) {
                                 height={30}
                                 className="rounded-full"
                             />
-                            <div className="break-words overflow-hidden">
+                            <div className="break-words overflow-x-hidden">
                                 <span className="font-bold pr-2.5">{message.global_name}</span>
-                                <span className="break-words overflow-hidden">{message.content}</span>
+                                <span className="break-words overflow-x-hidden">{message.content}</span>
                             </div>
                         </div>
                     );
