@@ -1,11 +1,12 @@
 import { UserState, Message, SOCKET_ENUM } from "@/types/types";
-import { SendHorizontal } from "lucide-react";
+import { SendHorizontal, Users } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import useWebSocket from "react-use-websocket";
 
 export default function Chat({ data }: { data: UserState }) {
     const [messages, setMessages] = useState<Message[]>([]);
+    const [userCount, setUserCount] = useState<number>(0);
     const chatRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -13,15 +14,22 @@ export default function Chat({ data }: { data: UserState }) {
         containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
     }, [messages.length]);
 
-    const { sendJsonMessage } = useWebSocket("wss://live.tryz.id.vn/ws", {
+    const { sendJsonMessage } = useWebSocket(process.env.NODE_ENV === "development" ? "ws://localhost:7277/" : "wss://live.tryz.id.vn/ws", {
         onOpen: () => {
             console.log("WebSocket connected!");
         },
         onMessage: (event) => {
             const { type, payload } = JSON.parse(event.data);
-            if (type !== SOCKET_ENUM.NEW_MESSAGE) return;
 
-            setMessages([...messages, payload]);
+            if (type === SOCKET_ENUM.NEW_MESSAGE) {
+                setMessages([...messages, payload]);
+                return;
+            }
+
+            if (type === SOCKET_ENUM.UPDATE_USERCOUNT) {
+                setUserCount(payload);
+                return;
+            }
         },
     });
 
@@ -62,6 +70,10 @@ export default function Chat({ data }: { data: UserState }) {
 
     return (
         <div className="bg-[#363753] lg:rounded-xl flex-1 flex flex-col overflow-hidden">
+            <div className="p-5 w-full text-bold flex gap-5">
+                <Users />
+                {userCount}
+            </div>
             <div className="flex-1 w-full p-5 bg-[#2B2C43] flex flex-col gap-5 overflow-y-auto" ref={containerRef}>
                 {messages.map((message, idx) => {
                     return (

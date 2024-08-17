@@ -17,4 +17,5 @@ export type Message = {
 
 export enum SOCKET_ENUM {
     NEW_MESSAGE = "NEW_MESSAGE",
+    UPDATE_USERCOUNT = "UPDATE_USERCOUNT",
 }
