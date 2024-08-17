@@ -1,9 +1,9 @@
 import { UserState } from "@/types/types";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import DiscordOauth2 from "discord-oauth2";
 import { getCookie } from "cookies-next";
 
-export default function useAuth() {
+export default function useAuth({ setError }: { setError: Dispatch<SetStateAction<string | undefined>> }) {
     const [state, setState] = useState<UserState>();
     const [accessToken] = [getCookie("access_token")];
 
@@ -29,6 +29,7 @@ export default function useAuth() {
                     isJoinedServer,
                 });
             } catch (error) {
+                setError(JSON.stringify(error));
                 setState(null);
             }
         };
