@@ -14,7 +14,7 @@ export default function Chat({ data }: { data: UserState }) {
         containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
     }, [messages.length]);
 
-    const { sendJsonMessage } = useWebSocket("wss://live.tryz.id.vn/ws", {
+    const { sendJsonMessage } = useWebSocket(process.env.NODE_ENV === "development" ? "ws://localhost:7277/" : "wss://live.tryz.id.vn/ws", {
         onOpen: () => {
             console.log("WebSocket connected!");
         },
@@ -46,7 +46,7 @@ export default function Chat({ data }: { data: UserState }) {
                 id: data?.id,
                 time: Date.now(),
                 content: chatContent,
-                isGuildAvatar: data?.isGuildAvatar
+                isGuildAvatar: data?.isGuildAvatar,
             },
         });
 
@@ -116,9 +116,7 @@ export default function Chat({ data }: { data: UserState }) {
                         const mes = message as JoinLeaveMessage;
                         return (
                             <div key={idx} className="flex gap-2.5 items-start">
-                                <div className="break-words overflow-x-hidden text-sm text-gray-400">
-                                    {mes.username} has joined the chat.
-                                </div>
+                                <div className="break-words overflow-x-hidden text-sm text-gray-400">{mes.username} has joined the chat.</div>
                             </div>
                         );
                     }

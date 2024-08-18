@@ -6,7 +6,15 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
     title: "Direct Stream",
-    description: "Ehe",
+    description: "Tsukimura Temari Radio 24/7",
+    icons: {
+        icon: "/@.svg",
+    },
+    openGraph: {
+        title: "Direct Stream",
+        description: "Tsukimura Temari Radio 24/7",
+        images: "https://cdn.tryz.id.vn/temari.jpg",
+    },
 };
 
 export default function RootLayout({
