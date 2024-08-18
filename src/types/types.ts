@@ -14,6 +14,7 @@ export type Message = {
     id: string;
     time: number;
     content: string;
+    isGuildAvatar: boolean;
 };
 
 export enum State {

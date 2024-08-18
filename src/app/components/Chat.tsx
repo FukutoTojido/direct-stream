@@ -14,7 +14,7 @@ export default function Chat({ data }: { data: UserState }) {
         containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
     }, [messages.length]);
 
-    const { sendJsonMessage } = useWebSocket(process.env.NODE_ENV === "development" ? "ws://localhost:7277/" : "wss://live.tryz.id.vn/ws", {
+    const { sendJsonMessage } = useWebSocket("wss://live.tryz.id.vn/ws", {
         onOpen: () => {
             console.log("WebSocket connected!");
         },
@@ -46,6 +46,7 @@ export default function Chat({ data }: { data: UserState }) {
                 id: data?.id,
                 time: Date.now(),
                 content: chatContent,
+                isGuildAvatar: data?.isGuildAvatar
             },
         });
 
@@ -94,9 +95,9 @@ export default function Chat({ data }: { data: UserState }) {
                             <div key={idx} className="flex gap-2.5 items-start">
                                 <Image
                                     src={
-                                        data!.isGuildAvatar
-                                            ? `https://cdn.discordapp.com/guilds/228205151981273088/users/${mes.id}/avatars/${mes.avatar}.png`
-                                            : `https://cdn.discordapp.com/avatars/${mes.id}/${mes.avatar}.png`
+                                        mes!.isGuildAvatar
+                                            ? `https://cdn.discordapp.com/guilds/228205151981273088/users/${mes.id}/avatars/${mes.avatar}.webp`
+                                            : `https://cdn.discordapp.com/avatars/${mes.id}/${mes.avatar}.webp`
                                     }
                                     alt=""
                                     width={30}
