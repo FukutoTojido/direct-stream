@@ -607,7 +607,7 @@ export function SrsRtcWhipWhepAsync() {
     // @options The options to control playing, supports:
     //      videoOnly: boolean, whether only play video, default to false.
     //      audioOnly: boolean, whether only play audio, default to false.
-    self.play = async function (url, options) {
+    self.play = async function (url, options, isJoinedServer) {
         if (url.indexOf("/whip-play/") === -1 && url.indexOf("/whep/") === -1) throw new Error(`invalid WHEP url ${url}`);
         if (options?.videoOnly && options?.audioOnly) throw new Error(`The videoOnly and audioOnly in options can't be true at the same time`);
 
@@ -616,21 +616,21 @@ export function SrsRtcWhipWhepAsync() {
 
         var offer = await self.pc.createOffer();
         await self.pc.setLocalDescription(offer);
-        const answer = await new Promise(function (resolve, reject) {
-            // console.log(`Generated offer: ${offer.sdp}`);
 
-            const xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-                if (xhr.readyState !== xhr.DONE) return;
-                if (xhr.status !== 200 && xhr.status !== 201) return reject(xhr);
-                const data = xhr.responseText;
-                // console.log("Got answer: ", data);
-                return data.code ? reject(xhr) : resolve(data);
-            };
-            xhr.open("POST", url, true);
-            xhr.setRequestHeader("Content-type", "application/sdp");
-            xhr.send(offer.sdp);
+        const res = await fetch(url, {
+            method: "POST",
+            body: JSON.stringify({
+                isJoinedServer,
+                sdp: offer.sdp,
+            }),
         });
+
+        if (!res.ok) {
+            return null;
+        }
+
+        const answer = await res.text();
+
         await self.pc.setRemoteDescription(new RTCSessionDescription({ type: "answer", sdp: answer }));
 
         return self.__internal.parseId(url, offer.sdp, answer);

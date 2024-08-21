@@ -16,13 +16,22 @@ export default function useAuth() {
 
             try {
                 const oauth = new DiscordOauth2({
-                    ratelimiterOffset: 1000
+                    ratelimiterOffset: 1000,
                 });
-                
+
                 const { username, avatar, id, global_name } = await oauth.getUser(accessToken);
-                const userGuilds = await oauth.getUserGuilds(accessToken);
-                const { nick, avatar: guildAvatar } = await oauth.getGuildMember(accessToken, "228205151981273088");
-                const isJoinedServer = userGuilds.some((server) => server.id === "228205151981273088");
+
+                let [nick, guildAvatar]: [nick?: string | null, guildAvatar?: string | null] = [null, null];
+                let isJoinedServer = false;
+
+                try {
+                    const { nick: nick_, avatar: guildAvatar_ } = await oauth.getGuildMember(accessToken, "228205151981273088");
+                    nick = nick_;
+                    guildAvatar = guildAvatar_;
+                    isJoinedServer = true;
+                } catch {
+                    isJoinedServer = false;
+                }
 
                 setState({
                     username,
@@ -30,7 +39,7 @@ export default function useAuth() {
                     avatar: guildAvatar ?? avatar ?? "",
                     id,
                     isJoinedServer,
-                    isGuildAvatar: guildAvatar ? true : false
+                    isGuildAvatar: guildAvatar ? true : false,
                 });
             } catch (error) {
                 console.log(error);

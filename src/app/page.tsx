@@ -29,7 +29,7 @@ export default function App() {
 
         if (!videoRef.current || !userData) return;
 
-        const videoUrl = "https://live.tryz.id.vn:8443/rtc/v1/whep/?app=live&stream=livestream";
+        const videoUrl = "/api/whep/";
 
         const initPlayer = async () => {
             const player = SrsRtcWhipWhepAsync();
@@ -38,7 +38,7 @@ export default function App() {
             setSdk(player);
 
             try {
-                await player.play(videoUrl);
+                await player.play(videoUrl, {}, userData.isJoinedServer);
             } catch (e) {
                 player?.close();
                 console.error(e);
