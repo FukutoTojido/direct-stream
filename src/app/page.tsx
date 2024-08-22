@@ -38,7 +38,7 @@ export default function App() {
             setSdk(player);
 
             try {
-                await player.play(videoUrl, {}, userData.isJoinedServer);
+                await player.play(videoUrl, {}, userData.id);
             } catch (e) {
                 player?.close();
                 console.error(e);
