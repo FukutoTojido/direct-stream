@@ -4,7 +4,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
 	const { uid, sdp } = await request.json();
 
 	const authRes = await fetch(
-		`${process.env.AUTH_ENDPOINT}/discord/checkUserId/${uid}`,
+		`${process.env.AUTH_ENDPOINT}/discordapi/checkUserId/${uid}`,
 	);
 	if (!authRes.ok) {
 		return new Response("Unauthorized", {
