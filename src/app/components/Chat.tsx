@@ -31,7 +31,6 @@ export default function Chat({ data }: { data: UserState }) {
 					type === SOCKET_ENUM.NEW_MESSAGE
 				) {
 					setMessages([...messages, payload]);
-					containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
 					return;
 				}
 
@@ -92,6 +91,10 @@ export default function Chat({ data }: { data: UserState }) {
 			payload: data,
 		});
 	}, [sendJsonMessage, data]);
+
+	useEffect(() => {
+		containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
+	}, [messages.length])
 
 	return (
 		<div className="bg-[#363753] lg:rounded-xl flex-1 flex flex-col overflow-hidden">
